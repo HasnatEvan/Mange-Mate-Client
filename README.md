@@ -10,8 +10,8 @@ Welcome to **Asset Management System**, a MERN stack-based web application devel
 - **Server Side**: [GitHub Repo (Server)](https://github.com/HasnatEvan/Mange-Mate-Server)
 
 ## 🛂 Admin Login Info
-- **HR Email**: hrmanager@xyz.com
-- **HR Password**: Hr@12345
+- **HR Email**: hasnatevan59@gmail.com
+- **HR Password**: 684456
 
 ## 🚀 Technologies Used
 - React + Vite
