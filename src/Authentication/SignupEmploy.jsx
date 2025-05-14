@@ -34,7 +34,7 @@ const SignupEmploy = () => {
                 status: 'requested',
             };
 
-            const res = await axios.post(`http://localhost:5000/users/${email}`, employUserInfo);
+            const res = await axios.post(`https://asset-management-system-server-kappa.vercel.app/users/${email}`, employUserInfo);
             console.log("User saved:", res.data);
 
             Swal.fire({

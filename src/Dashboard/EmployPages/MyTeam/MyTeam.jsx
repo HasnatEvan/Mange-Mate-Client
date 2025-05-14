@@ -2,28 +2,33 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import useAuth from "../../../Hooks/useAuth";
 import { FaUserAlt, FaEnvelope, FaBirthdayCake } from 'react-icons/fa';
+import { MdSync } from "react-icons/md";
 
 const MyTeam = () => {
     const { user } = useAuth();
     const [teamMembers, setTeamMembers] = useState([]);
+    const [isLoading, setIsLoading] = useState(true); // 🔄 loading state
 
     useEffect(() => {
         if (user?.email) {
-            axios.get(`http://localhost:5000/my-hr-email/${user.email}`)
+            axios.get(`https://asset-management-system-server-kappa.vercel.app/my-hr-email/${user.email}`)
                 .then(res => {
                     if (res.data.success) {
                         fetchTeamMembers(res.data.hrEmail);
+                    } else {
+                        setIsLoading(false); // ❌ error or no HR email
                     }
                 })
                 .catch(error => {
                     console.error("Error fetching HR email:", error);
+                    setIsLoading(false);
                 });
         }
     }, [user]);
 
     const fetchTeamMembers = (hrEmail) => {
         if (hrEmail) {
-            axios.get(`http://localhost:5000/team-members/${hrEmail}`)
+            axios.get(`https://asset-management-system-server-kappa.vercel.app/team-members/${hrEmail}`)
                 .then(res => {
                     if (res.data.success) {
                         setTeamMembers(res.data.members);
@@ -31,13 +36,25 @@ const MyTeam = () => {
                 })
                 .catch(error => {
                     console.error("Error fetching team members:", error);
+                })
+                .finally(() => {
+                    setIsLoading(false); // ✅ loading done
                 });
         }
     };
 
+    // 🔃 Show loading
+     if (isLoading) {
+    return (
+      <div className="text-center text-base md:text-lg font-medium text-primary">
+        <MdSync className="animate-spin inline-block mr-2 text-2xl text-primary" />
+        Loading...
+      </div>
+    );
+  }
+
     return (
         <div className="text-black p-4">
-
             {/* 📝 Title and Description */}
             <div className="mb-4">
                 <h2 className="text-2xl font-semibold text-center">Team Members</h2>
@@ -76,7 +93,6 @@ const MyTeam = () => {
                     </div>
                 ))}
             </div>
-
         </div>
     );
 };

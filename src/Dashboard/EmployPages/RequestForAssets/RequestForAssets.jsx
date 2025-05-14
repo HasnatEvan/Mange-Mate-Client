@@ -15,7 +15,7 @@ const RequestForAssets = () => {
   const { data: assets = [], isLoading, refetch } = useQuery({
     queryKey: ["assets"],
     queryFn: async () => {
-      const { data } = await axios.get("http://localhost:5000/assets");
+      const { data } = await axios.get("https://asset-management-system-server-kappa.vercel.app/assets");
       return data;
     },
   });

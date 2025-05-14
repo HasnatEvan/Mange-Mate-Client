@@ -25,7 +25,7 @@ const GoogleLogin = () => {
             };
 
             // Send user info to the backend
-            const res = await axios.post(`http://localhost:5000/users/${user?.email}`, userInfo);
+            const res = await axios.post(`https://asset-management-system-server-kappa.vercel.app/users/${user?.email}`, userInfo);
 
             if (res.data.insertedId) {
                 console.log('User added successfully');

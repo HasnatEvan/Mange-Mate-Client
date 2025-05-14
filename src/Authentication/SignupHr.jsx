@@ -52,7 +52,7 @@ const SignupHr = () => {
                 role: 'hr'
             };
 
-            const res = await axios.post(`http://localhost:5000/users/${email}`, hrUserInfo);
+            const res = await axios.post(`https://asset-management-system-server-kappa.vercel.app/users/${email}`, hrUserInfo);
             console.log('User saved to database:', res.data);
 
             form.reset();

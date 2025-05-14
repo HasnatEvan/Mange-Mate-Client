@@ -90,6 +90,15 @@ const Section = () => {
           </a>
         </div>
       </section>
+
+      {/* CSS for mobile background scroll fix */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .bg-cover {
+            background-attachment: scroll !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

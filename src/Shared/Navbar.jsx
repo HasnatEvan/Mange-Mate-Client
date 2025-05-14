@@ -10,7 +10,7 @@ const Navbar = () => {
     const { user, logOut } = useAuth();
 
 
-    console.log(user)
+    // console.log(user)
 
     const toggleMenu = () => setIsOpen(!isOpen);
     const closeMenu = () => setIsOpen(false);
@@ -84,7 +84,7 @@ const Navbar = () => {
             {/* Mobile Menu */}
             <div
                 ref={menuRef}
-                className={`md:hidden bg-white shadow-md text-center transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-96' : 'max-h-0'}`}
+                className={`md:hidden bg-white shadow-md text-center transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-screen py-4' : 'max-h-0 py-0'}`}
             >
                 <nav className="flex flex-col px-6 pb-4 pt-2 space-y-3 font-medium">
                     <Link to="/" onClick={closeMenu} className="hover:text-blue-600 flex items-center gap-2">
