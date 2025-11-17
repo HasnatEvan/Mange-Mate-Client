@@ -11,7 +11,7 @@ const MyTeam = () => {
 
     useEffect(() => {
         if (user?.email) {
-            axios.get(`https://asset-management-system-server-kappa.vercel.app/my-hr-email/${user.email}`)
+            axios.get(`http://localhost:5000/my-hr-email/${user.email}`)
                 .then(res => {
                     if (res.data.success) {
                         fetchTeamMembers(res.data.hrEmail);
@@ -28,7 +28,7 @@ const MyTeam = () => {
 
     const fetchTeamMembers = (hrEmail) => {
         if (hrEmail) {
-            axios.get(`https://asset-management-system-server-kappa.vercel.app/team-members/${hrEmail}`)
+            axios.get(`http://localhost:5000/team-members/${hrEmail}`)
                 .then(res => {
                     if (res.data.success) {
                         setTeamMembers(res.data.members);

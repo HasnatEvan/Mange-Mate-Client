@@ -1,8 +1,7 @@
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import Swal from 'sweetalert2';
-import useAxiosSecure from '../../../Hooks/useAxiosSecure';
-import { Link } from 'react-router-dom';
-import { FaBoxOpen, FaListAlt, FaHashtag } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaBoxOpen, FaListAlt, FaHashtag } from "react-icons/fa";
+import Swal from "sweetalert2";
+import useAxiosSecure from "../../../Hooks/useAxiosSecure";
+import { Link } from "react-router-dom";
 
 const MyAssetsListTable = ({ asset, refetch, isTable }) => {
     const { assetsName, assetsType, quantity, _id } = asset;
@@ -10,17 +9,19 @@ const MyAssetsListTable = ({ asset, refetch, isTable }) => {
 
     const handleDelete = async () => {
         const result = await Swal.fire({
-            title: "Cancel Request?",
-            text: "Are you sure you want to cancel this request?",
+            title: "Delete Asset?",
+            text: "Are you sure you want to delete this asset?",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Yes, cancel it!"
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!"
         });
 
         if (result.isConfirmed) {
             try {
                 await axiosSecure.delete(`/assets/${_id}`);
-                await Swal.fire("Cancelled", "Your request has been cancelled.", "success");
+                await Swal.fire("Deleted!", "Asset has been removed.", "success");
                 refetch();
             } catch (error) {
                 console.error(error);
@@ -29,79 +30,99 @@ const MyAssetsListTable = ({ asset, refetch, isTable }) => {
         }
     };
 
-    // If Table view
+    // ======================= TABLE ROW =======================
     if (isTable) {
         return (
-            <tr className="text-center">
-                <td className="border p-2">{assetsName}</td>
-                <td className="border p-2">{assetsType}</td>
-                <td className="border p-2">{quantity}</td>
-                <td className="border p-2">
-                    <div className="flex items-center justify-center gap-2">
-                        <Link to={`/dashboard/assets-update/${_id}`}
-                            className="bg-[#0149B1] text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-1"
+            <tr className="hover:bg-blue-50 transition-all border-b border-gray-200">
+                <td className="p-3 text-center text-gray-800 border-r border-gray-200">{assetsName}</td>
+
+                <td className="p-3 text-center text-gray-800 capitalize border-r border-gray-200">{assetsType}</td>
+
+                <td className="p-3 text-center text-gray-800 font-semibold border-r border-gray-200">{quantity}</td>
+
+                <td className="p-3 text-center">
+                    <div className="flex items-center justify-center gap-3">
+
+                        <Link
+                            to={`/dashboard/assets-update/${_id}`}
+                            className="p-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
                         >
-                            <FaEdit /> Update
+                            <FaEdit size={16} />
                         </Link>
+
                         <button
                             onClick={handleDelete}
-                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 flex items-center gap-1"
+                            className="p-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
                         >
-                            <FaTrash /> Delete
+                            <FaTrash size={16} />
                         </button>
+
                     </div>
                 </td>
             </tr>
+
+
         );
     }
 
-    // If Card view (mobile)
+    // ======================= MOBILE CARD =======================
     return (
-        <div className="border border-gray-300 p-4 rounded-lg shadow bg-white space-y-4">
-        {/* Name */}
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <FaBoxOpen className="text-blue-500" />
-                <span className="font-semibold">Name:</span>
-            </div>
-            <span>{assetsName}</span>
+       <div className="bg-white/80 backdrop-blur-md border  p-5
+           transition-all duration-300">
+
+    {/* NAME */}
+    <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-3 text-gray-800">
+            <FaBoxOpen className="text-blue-600 text-xl" />
+            <span className="font-semibold text-gray-700">Name</span>
         </div>
-    
-        {/* Type */}
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <FaListAlt className="text-green-500" />
-                <span className="font-semibold">Type:</span>
-            </div>
-            <span>{assetsType}</span>
-        </div>
-    
-        {/* Quantity */}
-        <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-                <FaHashtag className="text-purple-500" />
-                <span className="font-semibold">Quantity:</span>
-            </div>
-            <span>{quantity}</span>
-        </div>
-    
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-            <Link
-                to={`/dashboard/assets-update/${_id}`}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-1 w-full justify-center"
-            >
-                <FaEdit /> Update
-            </Link>
-            <button
-                onClick={handleDelete}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center gap-1 w-full justify-center"
-            >
-                <FaTrash /> Delete
-            </button>
-        </div>
+        <span className="font-semibold text-gray-900">{assetsName}</span>
     </div>
-    
+
+    {/* TYPE */}
+    <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-3 text-gray-800">
+            <FaListAlt className="text-green-600 text-xl" />
+            <span className="font-semibold text-gray-700">Type</span>
+        </div>
+        <span className="capitalize text-gray-900">{assetsType}</span>
+    </div>
+
+    {/* QUANTITY */}
+    <div className="flex justify-between items-center mb-5">
+        <div className="flex items-center gap-3 text-gray-800">
+            <FaHashtag className="text-purple-600 text-xl" />
+            <span className="font-semibold text-gray-700">Quantity</span>
+        </div>
+        <span className="font-semibold text-gray-900">{quantity}</span>
+    </div>
+
+    {/* ACTION BUTTONS */}
+    <div className="grid grid-cols-2 gap-4">
+
+        <Link
+            to={`/dashboard/assets-update/${_id}`}
+            className="py-3 bg-blue-600 text-white rounded-xl shadow-md 
+                       flex items-center justify-center gap-2 hover:bg-blue-700 
+                       transition-all active:scale-95"
+        >
+            <FaEdit size={18} />
+            <span className="font-medium text-sm">Update</span>
+        </Link>
+
+        <button
+            onClick={handleDelete}
+            className="py-3 bg-red-500 text-white rounded-xl shadow-md 
+                       flex items-center justify-center gap-2 hover:bg-red-600 
+                       transition-all active:scale-95"
+        >
+            <FaTrash size={18} />
+            <span className="font-medium text-sm">Delete</span>
+        </button>
+
+    </div>
+</div>
+
     );
 };
 

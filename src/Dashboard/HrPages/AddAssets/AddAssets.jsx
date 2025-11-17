@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
+
 import useAuth from "../../../Hooks/useAuth";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
+import { Player } from "@lottiefiles/react-lottie-player";
+import uploadingAnim from "../../../assets/Lottie/uploading.json";
+import toast from "react-hot-toast";
 
-// Icons
-import { FaBoxOpen, FaListAlt, FaHashtag, FaPlusCircle, FaBuilding } from "react-icons/fa";
+
+import {
+  FaBoxOpen,
+  FaListAlt,
+  FaHashtag,
+  FaPlusCircle,
+  FaBuilding,
+} from "react-icons/fa";
 
 const AddAssets = () => {
   const { user } = useAuth();
@@ -12,7 +21,7 @@ const AddAssets = () => {
   const [loading, setLoading] = useState(false);
   const [companyName, setCompanyName] = useState("");
 
-  // ✅ Fetch HR info (company name) from user collection
+  // Fetch company name
   useEffect(() => {
     const fetchCompanyName = async () => {
       try {
@@ -25,153 +34,220 @@ const AddAssets = () => {
       }
     };
 
-    if (user?.email) {
-      fetchCompanyName();
-    }
+    if (user?.email) fetchCompanyName();
   }, [user, axiosSecure]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  setLoading(true);
 
-    const form = event.target;
-    const assetsName = form.assetsName.value;
-    const assetsType = form.assetsType.value;
-    const quantity = form.quantity.value;
+  // 3 second delay
+  await new Promise(res => setTimeout(res, 3000));
 
-    const hr = {
-      name: user?.displayName,
-      image: user?.photoURL,
-      email: user?.email,
-    };
+  const form = event.target;
+  const assetsName = form.assetsName.value;
+  const assetsType = form.assetsType.value;
+  const quantity = form.quantity.value;
 
-    const assetsData = {
-      assetsName,
-      assetsType,
-      quantity,
-      companyName,
-      hr,
-    };
-
-    try {
-      const res = await axiosSecure.post("/assets", assetsData);
-      if (res.data.insertedId) {
-        Swal.fire({
-          title: "Success!",
-          text: "Asset added successfully!",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
-        form.reset();
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Error!",
-        text: "Something went wrong!",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const hr = {
+    name: user?.displayName,
+    image: user?.photoURL,
+    email: user?.email,
   };
 
+  const assetsData = {
+    assetsName,
+    assetsType,
+    quantity,
+    companyName,
+    hr,
+    timestamp: new Date(),
+  };
+
+  try {
+    const res = await axiosSecure.post("/assets", assetsData);
+
+    if (res.data.insertedId) {
+      toast.success("Asset added successfully!", {
+        style: {
+          background: "#ffffff",
+          color: "#000",
+          border: "1px solid #3b82f6",
+        },
+      });
+
+      form.reset();
+    }
+  } catch (error) {
+    toast.error("Could not add asset!", {
+      style: {
+        background: "#ffeded",
+        color: "#d60000",
+        border: "1px solid #ff7979",
+      },
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
   return (
-    <div className="min-h-screen  flex items-center justify-center px-4 py-12 text-black">
-      <div className="container mx-auto flex flex-col lg:flex-row gap-8 items-center justify-center">
-        {/* Side Info Panel */}
-        <div className="lg:w-1/2 w-full text-center lg:text-left">
-          <h2 className="text-3xl font-bold text-[#0149B1] mb-4">Manage Your Inventory</h2>
-          <p className="text-gray-600">
-            Easily add and organize company assets. Ensure each item is accurately categorized
-            as <strong>Returnable</strong> or <strong>Non-returnable</strong> for efficient tracking.
+    <div className="min-h-screen px-4 py-10 bg-gradient-to-br from-blue-50 to-blue-100 flex justify-center items-center">
+      <div
+        className="
+          w-full max-w-7xl 
+          backdrop-blur-xl bg-white/70 shadow-2xl border border-white/40 
+          rounded-3xl p-6 md:p-12 
+          grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-12
+        "
+      >
+        {/* LEFT PANEL */}
+        <div className="flex flex-col justify-center items-center text-center lg:text-left px-2">
+          <Player
+            autoplay
+            loop
+            src={uploadingAnim}
+            className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 drop-shadow-2xl"
+          />
+
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-blue-700 mt-6">
+            Smart Asset Management
+          </h2>
+
+          <p className="text-gray-600 text-sm sm:text-base mt-3 leading-relaxed max-w-md">
+            Keep your assets well-organized with clear naming, correct
+            categorization and proper stock information.
           </p>
-          <ul className="mt-4 list-disc list-inside text-sm text-gray-500">
-            <li>Use clear asset names (e.g., Dell Laptop, Office Chair).</li>
-            <li>Set the correct type to avoid inventory mismatch.</li>
-            <li>Ensure the quantity reflects actual stock.</li>
+
+          <ul className="mt-4 space-y-2 text-gray-600 text-sm md:text-base">
+            <li className="flex items-center gap-2">✔ Add assets quickly</li>
+            <li className="flex items-center gap-2">✔ Clear & searchable data</li>
+            <li className="flex items-center gap-2">✔ Professional tracking</li>
           </ul>
         </div>
 
-        {/* Asset Form */}
-        <div className="lg:w-1/2 w-full bg-gray-100 p-6">
-          <h2 className="text-2xl font-bold mb-6 text-center text-[#0149B1] flex items-center justify-center gap-2">
-            <FaPlusCircle /> Add a New Asset
+        {/* RIGHT PANEL (FORM) */}
+        <div
+          className="
+            backdrop-blur-xl bg-white/70 
+            p-6 sm:p-8 rounded-2xl 
+            hover:shadow-2xl transition-all duration-300
+          "
+        >
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-700 mb-8 flex items-center justify-center gap-2">
+            <FaPlusCircle className="text-blue-600" /> Add New Asset
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Company Name */}
-            <div>
-              <label className="block text-sm font-medium mb-1 flex items-center gap-1">
-                <FaBuilding /> Company Name
-              </label>
-              <input
-                type="text"
-                name="companyName"
-                value={companyName}
-                readOnly
-                className="w-full border border-gray-300 rounded p-2 bg-gray-200"
-              />
-            </div>
 
-            {/* Assets Name */}
-            <div>
-              <label className="block text-sm font-medium mb-1 flex items-center gap-1">
-                <FaBoxOpen /> Assets Name
-              </label>
-              <input
-                type="text"
-                name="assetsName"
-                placeholder="Enter asset name"
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                required
-              />
-            </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
 
-            {/* Assets Type */}
-            <div>
-              <label className="block text-sm font-medium mb-1 flex items-center gap-1">
-                <FaListAlt /> Assets Type
-              </label>
-              <select
-                name="assetsType"
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                required
-              >
-                <option value="returnable">Returnable</option>
-                <option value="non-returnable">Non-returnable</option>
-              </select>
-            </div>
+  {/* Company Name */}
+  <div>
+    <label className="block text-sm font-semibold mb-2 text-gray-700">
+      <FaBuilding className="inline mr-2" />
+      Company Name
+    </label>
+    <input
+      type="text"
+      value={companyName}
+      readOnly
+      placeholder="Company Name"
+      className="
+        w-full bg-gray-100 border border-gray-300 rounded-xl p-3
+        text-black
+        placeholder:text-black placeholder:opacity-100 placeholder:font-medium
+      "
+    />
+  </div>
 
-            {/* Assets Quantity */}
-            <div>
-              <label className="block text-sm font-medium mb-1 flex items-center gap-1">
-                <FaHashtag /> Assets Quantity
-              </label>
-              <input
-                type="number"
-                min="1"
-                name="quantity"
-                placeholder="Enter asset quantity"
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                required
-              />
-            </div>
+  {/* Asset Name */}
+  <div>
+    <label className="block text-sm font-semibold mb-2 text-gray-700">
+      <FaBoxOpen className="inline mr-2" />
+      Asset Name
+    </label>
+    <input
+      type="text"
+      name="assetsName"
+      placeholder="Enter asset name"
+      className="
+        w-full border border-gray-300 rounded-xl p-3 
+        text-black
+        focus:ring-2 focus:ring-blue-500 transition
+        placeholder:text-black placeholder:opacity-100 placeholder:font-medium
+      "
+      required
+    />
+  </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-[#FD8E29] text-white py-2 rounded hover:bg-primary-dark transition flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <span className="loading loading-dots loading-sm"></span>
-              ) : (
-                <>
-                  <FaPlusCircle /> Add Asset
-                </>
-              )}
-            </button>
-          </form>
+  {/* Asset Type */}
+  <div>
+    <label className="block text-sm font-semibold mb-2 text-gray-700">
+      <FaListAlt className="inline mr-2" />
+      Asset Type
+    </label>
+    <select
+      name="assetsType"
+      defaultValue=""
+      className="
+        w-full border border-gray-300 rounded-xl p-3 
+        text-black
+        focus:ring-2 focus:ring-blue-500 
+        placeholder:text-black placeholder:opacity-100 placeholder:font-medium
+      "
+      required
+    >
+      <option value="" disabled className="text-gray-400">
+        Select type
+      </option>
+      <option value="returnable">Returnable</option>
+      <option value="non-returnable">Non-returnable</option>
+    </select>
+  </div>
+
+  {/* Quantity */}
+  <div>
+    <label className="block text-sm font-semibold mb-2 text-gray-700">
+      <FaHashtag className="inline mr-2" />
+      Quantity
+    </label>
+    <input
+      type="number"
+      min="1"
+      name="quantity"
+      placeholder="Enter quantity"
+      className="
+        w-full border border-gray-300 rounded-xl p-3 
+        text-black
+        focus:ring-2 focus:ring-blue-500 transition 
+        placeholder:text-black placeholder:opacity-100 placeholder:font-medium
+      "
+      required
+    />
+  </div>
+
+  {/* Submit Button */}
+  <button
+    type="submit"
+    className="
+      w-full py-3 rounded-xl font-semibold text-white text-lg
+      bg-gradient-to-r from-blue-600 to-blue-500
+      hover:from-blue-700 hover:to-blue-600
+      shadow-md hover:shadow-xl transition flex items-center justify-center gap-3
+    "
+  >
+    {loading ? (
+      <span className="loading loading-ring loading-lg"></span>
+    ) : (
+      <>
+        <FaPlusCircle className="text-white" /> Add Asset
+      </>
+    )}
+  </button>
+
+</form>
+
         </div>
       </div>
     </div>

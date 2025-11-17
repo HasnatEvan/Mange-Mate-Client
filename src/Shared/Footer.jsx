@@ -1,58 +1,92 @@
-import { FaFacebookF, FaTwitter, FaLinkedinIn, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa";
-import logo from '../../src/assets/logo/logo.png'
-import { Link } from "react-router-dom";
+import logo from '../../src/assets/logo/logo.png';
+import { FaBehance, FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className="bg-white text-gray-800 py-12 border-t border-gray-200">
-      <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
+    <footer className="bg-white text-gray-700 py-5 border-t border-gray-200">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* TOP SECTION */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
 
-        {/* Company Info */}
-        <div>
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Logo" className="h-12 w-auto mb-2" />
-          </Link>
-          <p className="text-base">
-            Simplifying asset management for modern businesses. Join us and make managing easier.
-          </p>
-        </div>
+          {/* LOGO + TEXT */}
+          <div className="flex flex-col">
+            <img src={logo} alt="Logo" className="w-40 mb-6" />
+            <p className="text-sm leading-relaxed text-gray-600">
+              7X Theme is a modern template for interior and architecture purposes.  
+              Thanks to your passion, we keep designing the best.
+            </p>
 
-        {/* Contact Info */}
-        <div>
-          <h3 className="text-xl font-semibold mb-4 text-[#0149B1]">Contact Information</h3>
-          <ul className="space-y-3 text-sm md:text-base">
-            <li className="flex items-center justify-center md:justify-start gap-2">
-              <FaEnvelope className="text-[#0149B1]" /> hasnatevan59@gmail.com
-            </li>
-            <li className="flex items-center justify-center md:justify-start gap-2">
-              <FaPhoneAlt className="text-[#0149B1]" /> +880 1814-197707
-            </li>
-            <li className="flex items-center justify-center md:justify-start gap-2">
-              <FaMapMarkerAlt className="text-[#0149B1]" /> 123 Gulshan Ave, Dhaka, Bangladesh
-            </li>
-          </ul>
-        </div>
+            {/* Social Icons */}
+            <div className="flex items-center gap-4 mt-6">
+              {[FaBehance, FaFacebookF, FaTwitter, FaInstagram].map((Icon, idx) => (
+                <div
+                  key={idx}
+                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition"
+                >
+                  <Icon className="text-black" />
+                </div>
+              ))}
+            </div>
+          </div>
 
-        {/* Social Icons */}
-        <div>
-          <h3 className="text-xl font-semibold mb-4 text-[#0149B1]">Follow Us</h3>
-          <div className="flex justify-center md:justify-start space-x-6 text-2xl">
-            <a href="#">
-              <FaFacebookF className="hover:text-[#145dbf] text-[#1877F2]" />
-            </a>
-            <a href="#">
-              <FaTwitter className="hover:text-[#0d8ddb] text-[#1DA1F2]" />
-            </a>
-            <a href="#">
-              <FaLinkedinIn className="hover:text-[#084a87] text-[#0A66C2]" />
-            </a>
+          {/* Recent Posts (shifted slightly right) */}
+          <div className="flex flex-col md:pl-6 lg:pl-12">
+            <h2 className="font-semibold text-lg text-black mb-6">Recent Posts</h2>
+            {[ 
+              { date: "15 OCT 2019", title: "On these beams, we’re.", comments: 28 },
+              { date: "17 OCT 2019", title: "We’ll be a sensation for", comments: 29 },
+              { date: "18 OCT 2019", title: "We’ll be a sensation for", comments: 29 },
+            ].map((post, idx) => (
+              <div key={idx} className="mb-6">
+                <p className="text-2xl font-bold text-black">{post.date.split(' ')[0]}</p>
+                <p className="text-xs mb-1">{post.date}</p>
+                <p className="font-medium">{post.title}</p>
+                <p className="text-sm text-gray-500">By Admin • {post.comments}</p>
+              </div>
+            ))}
+          </div>
 
+          {/* Useful Links + Newsletter (shifted right) */}
+          <div className="flex flex-col justify-between md:pl-6 lg:pl-12">
+            <div>
+              <h2 className="font-semibold text-lg text-black mb-6">Useful Links</h2>
+              <ul className="space-y-3">
+                {["About", "Services", "Projects", "Blog", "Contact Us"].map((link, idx) => (
+                  <li key={idx} className="hover:text-black cursor-pointer transition">
+                    {link}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Newsletter Section */}
+            <div className="mt-10 sm:mt-6 p-4 sm:p-6 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 w-full">
+              <input 
+                type="email" 
+                placeholder="ENTER YOUR EMAIL" 
+                className="flex-1 bg-white px-4 py-3 outline-none text-sm text-black rounded-md shadow-sm w-full sm:w-auto"
+              />
+              <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-800 transition w-full sm:w-auto">
+                Subscribe
+              </button>
+            </div>
+          </div>
+
+          {/* Contact Us (kept right aligned as before) */}
+          <div className="flex flex-col md:pl-8 lg:pl-16 xl:pl-24">
+            <h2 className="font-semibold text-lg text-black mb-6">Contact Us</h2>
+            <p className="text-sm mb-2">756 Livingston Street, Brooklyn, NY</p>
+            <p className="text-sm mb-4">11201, United States</p>
+            <p className="text-sm mb-4">7xthemedemo@gmail.com</p>
+            <p className="text-sm mb-2">(+298) 012–3456–789</p>
+            <p className="text-sm mb-2">(+298) 146–6543–480</p>
           </div>
         </div>
-      </div>
 
-      <div className="text-center text-sm mt-10 border-t pt-4 border-gray-300 text-gray-600">
-        © {new Date().getFullYear()} ManageMate. All rights reserved.
+        {/* Copyright */}
+        <p className="text-center text-sm text-gray-500 py-5 mt-5">
+          © 2019 Your Company. Designed by 7X Theme.
+        </p>
       </div>
     </footer>
   );

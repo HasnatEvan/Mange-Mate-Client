@@ -1,61 +1,141 @@
-
-import { FaCheckCircle } from "react-icons/fa"; // এখানে React Icons থেকে Check Icon ইমপোর্ট করছি
+import { useEffect, useState, useRef } from "react";
+import { FaStar, FaMedal, FaCheckCircle } from "react-icons/fa";
 
 const Packages = () => {
-  const packages = [
-    {
-      title: "Starter Plan",
-      description: "For small teams managing up to 5 employees.",
-      price: "$5/month",
-      features: ["Up to 5 employees", "Basic analytics", "Email support"],
-    },
-    {
-      title: "Growth Plan",
-      description: "For growing teams managing up to 10 employees.",
-      price: "$8/month",
-      features: ["Up to 10 employees", "Advanced analytics", "Priority support"],
-    },
-    {
-      title: "Enterprise Plan",
-      description: "For larger teams managing up to 20 employees.",
-      price: "$15/month",
-      features: [
-        "Up to 20 employees",
-        "Comprehensive analytics",
-        "Dedicated support",
-      ],
-    },
-  ];
+  const sectionRef = useRef(null);
+
+  // State for animated numbers
+  const [starterPrice, setStarterPrice] = useState(0);
+  const [growthPrice, setGrowthPrice] = useState(0);
+  const [enterprisePrice, setEnterprisePrice] = useState(0);
+
+  const animateNumbers = () => {
+    const duration = 1000; // total animation time in ms
+    const stepsStarter = 5; 
+    const stepsGrowth = 8;
+    const stepsEnterprise = 15;
+
+    let currentStarter = 0;
+    let currentGrowth = 0;
+    let currentEnterprise = 0;
+
+    const starterInterval = setInterval(() => {
+      currentStarter += 1;
+      if (currentStarter > stepsStarter) clearInterval(starterInterval);
+      else setStarterPrice(currentStarter);
+    }, duration / stepsStarter);
+
+    const growthInterval = setInterval(() => {
+      currentGrowth += 1;
+      if (currentGrowth > stepsGrowth) clearInterval(growthInterval);
+      else setGrowthPrice(currentGrowth);
+    }, duration / stepsGrowth);
+
+    const enterpriseInterval = setInterval(() => {
+      currentEnterprise += 1;
+      if (currentEnterprise > stepsEnterprise) clearInterval(enterpriseInterval);
+      else setEnterprisePrice(currentEnterprise);
+    }, duration / stepsEnterprise);
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            animateNumbers();
+          }
+        });
+      },
+      { threshold: 0.5 } // trigger when 50% of the section is visible
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+
+    return () => {
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
+    };
+  }, []);
 
   return (
-    <section className="bg-white py-12 lg:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-12">
-          𝑶𝒖𝒓 𝑷𝒂𝒄𝒌𝒂𝒈𝒆𝒔
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {packages.map((pkg, index) => (
-            <div
-              key={index}
-              className="bg-gray-50 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 p-8 flex flex-col items-center text-center"
-            >
-              <h3 className="text-xl sm:text-2xl font-semibold text-gray-500 font-serif">
-                {pkg.title}
-              </h3>
-              <p className="mt-2 text-gray-600 text-sm sm:text-base">{pkg.description}</p>
-              <p className="mt-4 text-2xl font-bold text-gray-400">{pkg.price}</p>
-              <ul className="mt-6 space-y-3 text-gray-700 text-sm sm:text-base w-full">
-                {pkg.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2">
-                    <FaCheckCircle className="text-green-500" /> {feature}
-                  </li>
-                ))}
-              </ul>
-              <button className="mt-8 px-6 py-3 bg-[#FD8E29] text-white font-semibold rounded-lg hover:bg-[#FD8E29] focus:outline-none focus:ring-2 focus:ring-white transition">
-                𝑮𝒆𝑡 𝑺𝒕𝒂𝒓𝒕𝒆𝒅
-              </button>
-            </div>
-          ))}
+    <section ref={sectionRef} className="max-w-6xl mx-auto px-4 py-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        {/* Starter Plan */}
+        <div className="border rounded-2xl overflow-hidden shadow-sm transform transition duration-500 hover:scale-105 hover:shadow-xl">
+          <div className="bg-teal-700 text-white text-center p-6 rounded-b-[2rem]">
+            <FaStar className="mx-auto text-3xl mb-2 transition-transform duration-500 hover:rotate-12 hover:scale-110" />
+            <h3 className="text-lg font-semibold bg-teal-800 inline-block px-4 py-1 rounded-full">
+              Starter Plan
+            </h3>
+            <h2 className="text-4xl sm:text-5xl font-bold mt-4">
+              ${starterPrice} <span className="text-lg font-medium">/Month</span>
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed">
+              For small teams managing up to 5 employees.
+            </p>
+          </div>
+          <div className="text-center text-gray-600 py-6 space-y-3">
+            <p>Up to 5 employees</p>
+            <hr className="w-3/4 mx-auto border-gray-300" />
+            <p>Basic analytics</p>
+            <hr className="w-3/4 mx-auto border-gray-300" />
+            <p>Email support</p>
+            <button className="mt-6 bg-teal-700 text-white px-6 sm:px-8 py-3 rounded-full font-semibold hover:bg-teal-800 transition-all duration-300 transform hover:scale-105">
+              Get Started
+            </button>
+          </div>
+        </div>
+
+        {/* Growth Plan */}
+        <div className="border rounded-2xl overflow-hidden shadow-sm transform transition duration-500 hover:scale-105 hover:shadow-xl">
+          <div className="bg-blue-500 text-white text-center p-6 rounded-b-[2rem]">
+            <FaMedal className="mx-auto text-3xl mb-2 transition-transform duration-500 hover:rotate-12 hover:scale-110" />
+            <h3 className="text-lg font-semibold bg-blue-800 inline-block px-4 py-1 rounded-full">
+              Growth Plan
+            </h3>
+            <h2 className="text-4xl sm:text-5xl font-bold mt-4">
+              ${growthPrice} <span className="text-lg font-medium">/Month</span>
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed">
+              For growing teams managing up to 10 employees.
+            </p>
+          </div>
+          <div className="text-center text-gray-600 py-6 space-y-3">
+            <p>Up to 10 employees</p>
+            <hr className="w-3/4 mx-auto border-gray-300" />
+            <p>Advanced analytics</p>
+            <hr className="w-3/4 mx-auto border-gray-300" />
+            <p>Priority support</p>
+            <button className="mt-6 bg-blue-500 text-white px-6 sm:px-8 py-3 rounded-full font-semibold hover:bg-blue-800 transition-all duration-300 transform hover:scale-105">
+              Get Started
+            </button>
+          </div>
+        </div>
+
+        {/* Enterprise Plan */}
+        <div className="border rounded-2xl overflow-hidden shadow-sm transform transition duration-500 hover:scale-105 hover:shadow-xl">
+          <div className="bg-[#223666] text-white text-center p-6 rounded-b-[2rem]">
+            <FaCheckCircle className="mx-auto text-3xl mb-2 transition-transform duration-500 hover:rotate-12 hover:scale-110" />
+            <h3 className="text-lg font-semibold bg-purple-800 inline-block px-4 py-1 rounded-full">
+              Enterprise Plan
+            </h3>
+            <h2 className="text-4xl sm:text-5xl font-bold mt-4">
+              ${enterprisePrice} <span className="text-lg font-medium">/Month</span>
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed">
+              For larger teams managing up to 20 employees.
+            </p>
+          </div>
+          <div className="text-center text-gray-600 py-6 space-y-3">
+            <p>Up to 20 employees</p>
+            <hr className="w-3/4 mx-auto border-gray-300" />
+            <p>Comprehensive analytics</p>
+            <hr className="w-3/4 mx-auto border-gray-300" />
+            <p>Dedicated support</p>
+            <button className="mt-6 bg-[#223666] text-white px-6 sm:px-8 py-3 rounded-full font-semibold hover:bg-[#223666] transition-all duration-300 transform hover:scale-105">
+              Get Started
+            </button>
+          </div>
         </div>
       </div>
     </section>

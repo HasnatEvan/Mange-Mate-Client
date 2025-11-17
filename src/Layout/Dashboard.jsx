@@ -1,196 +1,211 @@
-import { useState, useEffect } from 'react';
-import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'; // useNavigate import
+import { useState, useRef, useEffect } from "react";
 import {
   FaBars,
+  FaBell,
+  FaThLarge,
+  FaCog,
+  FaMoon,
   FaTimes,
   FaHome,
   FaClipboardList,
-  FaAsterisk,
-  FaUserFriends,
-  FaUsersCog,
-  FaUserPlus,
   FaLaptopHouse,
-  FaListAlt,
   FaRegPaperPlane,
-  FaUserCircle,
-  FaSignOutAlt,
-} from 'react-icons/fa';
-import useRole from '../Hooks/useRole';
-import { MdSync } from 'react-icons/md';
-import logo from '../../src/assets/logo/logo.png'
-import useAuth from '../Hooks/useAuth';
-  import Swal from 'sweetalert2'; // import sweetalert2
-// Sidebar Item Component
-const SidebarItem = ({ to, icon: Icon, label, onClick }) => {
-  if (!Icon) return null;
-  return (
-    <li>
-      {to ? (
-        <NavLink
-          to={to}
-          className={({ isActive }) =>
-            isActive
-              ? 'text-[#0149B1] font-bold flex items-center gap-2 p-2 rounded bg-gray-100'
-              : 'flex items-center gap-2 p-2 rounded hover:bg-gray-200'
-          }
-          onClick={onClick}
-        >
-          <Icon />
-          <span>{label}</span>
-        </NavLink>
-      ) : (
-        <button
-          onClick={onClick}
-          className="flex items-center gap-2 p-2 rounded hover:bg-gray-200 w-full text-left"
-        >
-          <Icon />
-          <span>{label}</span>
-        </button>
-      )}
-    </li>
-  );
-};
+  FaUserFriends,
+  FaUserPlus,
+  FaUsers,
+  FaAsterisk,
+} from "react-icons/fa";
+import { IoSearch } from "react-icons/io5";
+import { Link, Outlet } from "react-router-dom";
+import logo from "../../src/assets/logo/logo.png";
+import useAuth from "../Hooks/useAuth";
+import useRole from "../Hooks/useRole";
 
-// Main Dashboard Layout
-const Dashboard = () => {
+const DashboardNavbar = () => {
+  const { user } = useAuth();
   const [role, isLoading] = useRole();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const navigate = useNavigate(); // useNavigate initialize
-  const {  logOut } = useAuth();
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    console.log("Search submitted:", searchQuery);
+  };
 
-const handleLogout = () => {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: "You will be logged out!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, logout!'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      logOut()
-        .then(() => {
-          Swal.fire(
-            'Logged Out!',
-            'You have been logged out successfully.',
-            'success'
-          );
-          navigate('/login'); // logout এর পর login পেজে নিয়ে যাবে
-        })
-        .catch((error) => {
-          console.error(error);
-          Swal.fire(
-            'Oops!',
-            'Something went wrong while logging out.',
-            'error'
-          );
-        });
-    }
-  });
-};
-
-
+  // Dropdown close on outside click
   useEffect(() => {
-    if (!isLoading) {
-      if (role === 'hr') {
-        navigate('/dashboard/hr-home');
-      } else if (role === 'employee') {
-        navigate('/dashboard/emHome');
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
       }
-    }
-  }, [role, isLoading, navigate]);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center text-base md:text-lg font-medium text-primary">
-          <MdSync className="animate-spin inline-block mr-2 text-2xl text-primary" />
-          Loading...
-        </div>
-      </div>
-    );
+  // Role-wise links
+  const adminLinks = [
+    { to: "/dashboard/admin-dashbord", icon: <FaHome />, label: "Admin Dashboard" },
+  ];
+
+  const hrLinks = [
+    { to: "/dashboard/hr-home", icon: <FaHome />, label: "HR Home" },
+    { to: "/dashboard/asset-list", icon: <FaClipboardList />, label: "Asset List" },
+    { to: "/dashboard/addAssets", icon: <FaLaptopHouse />, label: "Add an Asset" },
+    { to: "/dashboard/all-requests", icon: <FaRegPaperPlane />, label: "All Requests" },
+    { to: "/dashboard/employee-list", icon: <FaUserFriends />, label: "My Employee List" },
+    { to: "/dashboard/add-employee", icon: <FaUserPlus />, label: "Add an Employee" },
+  ];
+
+  const employeeLinks = [
+    { to: "/dashboard/emHome", icon: <FaHome />, label: "Employee Home" },
+    { to: "/dashboard/my-assets", icon: <FaClipboardList />, label: "My Assets" },
+    { to: "/dashboard/my-team", icon: <FaUsers />, label: "My Team" },
+    { to: "/dashboard/request-asset", icon: <FaAsterisk />, label: "Request for Asset" },
+  ];
+
+  // Set links by role
+  let links = [];
+  if (!isLoading) {
+    if (role === "admin") links = adminLinks;
+    else if (role === "hr") links = hrLinks;
+    else if (role === "employee") links = employeeLinks;
   }
 
   return (
-    <div className="flex h-screen overflow-hidden text-black">
-      {/* Mobile Toggle Button */}
-      <button
-        className="lg:hidden fixed top-4 left-4 z-50 bg-primary text-white p-2 rounded-full shadow-lg"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        {isSidebarOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
-      </button>
+    <>
+      {/* Navbar */}
+      <header className="w-full bg-white border-b flex items-center justify-between px-4 py-2 shadow-sm fixed top-0 z-30">
+        {/* Left: Logo */}
+        <div className="flex items-center gap-3">
+          <img src={logo} alt="ABSTACK Logo" className="h-8" />
+        </div>
+
+        {/* Center: Search */}
+        <form
+          onSubmit={handleSearchSubmit}
+          className="hidden sm:flex mx-auto w-full max-w-sm md:max-w-md relative"
+        >
+          <IoSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 text-lg" />
+          <input
+            type="text"
+            placeholder="Search something.."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="pl-10 pr-4 py-2 bg-gray-100 rounded-full text-sm text-black focus:outline-none w-full placeholder-gray-400"
+          />
+        </form>
+
+        {/* Right Icons */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <FaBell className="text-gray-500 text-lg cursor-pointer" />
+          <FaThLarge className="text-gray-500 text-lg cursor-pointer hidden sm:block" />
+          <FaCog className="text-gray-500 text-lg cursor-pointer hidden sm:block" />
+          <FaMoon className="text-gray-500 text-lg cursor-pointer hidden md:block" />
+
+          {/* Profile Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+              <img
+                src={
+                  user?.photoURL ||
+                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                }
+                alt="Profile"
+                className="h-8 w-8 rounded-full object-cover"
+              />
+              <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                {user?.displayName || "User"}
+              </span>
+              <svg
+                className="w-4 h-4 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-1">
+                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  My Account
+                </button>
+                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  Support
+                </button>
+                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar Toggle (Mobile) */}
+          <FaBars
+            className="text-gray-600 text-xl cursor-pointer sm:hidden"
+            onClick={() => setSidebarOpen(true)}
+          />
+        </div>
+      </header>
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-base-200 p-4 z-40 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out bg-white`}
+        className={`fixed top-12 left-0 h-[calc(100%-56px)] w-64 bg-white shadow-lg z-20 
+        transform transition-transform duration-300 
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+        sm:translate-x-0`}
       >
-        {/* Sidebar Title */}
-        <div className="mb-6 flex justify-center">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Logo" className="h-10 w-auto" />
-          </Link>
+        {/* Close button for mobile */}
+        <div className="flex justify-end p-4 sm:hidden">
+          <FaTimes
+            className="text-gray-600 text-xl cursor-pointer"
+            onClick={() => setSidebarOpen(false)}
+          />
         </div>
 
-        {/* Sidebar Menu */}
-        <ul className="menu space-y-2 text-gray-600">
-          {role === 'hr' && (
-            <>
-              <SidebarItem to="/dashboard/hr-home" icon={FaHome} label="HR Home" />
-              <SidebarItem to="/dashboard/asset-list" icon={FaListAlt} label="Asset List" />
-              <SidebarItem to="/dashboard/addAssets" icon={FaLaptopHouse} label="Add an Asset" />
-              <SidebarItem to="/dashboard/all-requests" icon={FaRegPaperPlane} label="All Requests" />
-              <SidebarItem to="/dashboard/employee-list" icon={FaUsersCog} label="My Employee List" />
-              <SidebarItem to="/dashboard/add-employee" icon={FaUserPlus} label="Add an Employee" />
-              <div className="divider" />
-            </>
-          )}
-
-          {role === 'employee' && (
-            <>
-              <SidebarItem to="/dashboard/emHome" icon={FaHome} label="Employee Home" />
-              <SidebarItem to="/dashboard/my-assets" icon={FaClipboardList} label="My Assets" />
-              <SidebarItem to="/dashboard/my-team" icon={FaUserFriends} label="My Team" />
-              <SidebarItem to="/dashboard/request-asset" icon={FaAsterisk} label="Request for an Asset" />
-              <div className="divider" />
-            </>
-          )}
-
-          {!role && (
-            <div className="text-center text-red-500 font-semibold mt-4">
-              🚫 You have no assigned role. <br /> Please contact admin.
-            </div>
-          )}
-
-          {/* Shared Navigation */}
-          <SidebarItem to="/" icon={FaHome} label="Home" />
-          <SidebarItem icon={FaSignOutAlt} label="Logout" onClick={handleLogout} />
-        </ul>
-      </div>
-
-      {/* Main Content */}
-      <div
-        className="flex-1 flex flex-col overflow-y-auto bg-gray-50"
-        onClick={() => isSidebarOpen && setIsSidebarOpen(false)}
-      >
-        <div className="p-4">
-          {!role ? (
-            <div className="flex justify-center items-center h-full">
-              <div className="text-center text-lg font-medium text-red-500">
-                🚫 You have no assigned role. <br /> Please contact admin.
-              </div>
-            </div>
+        {/* Sidebar Links */}
+        <nav className="flex flex-col px-4 gap-5 overflow-y-auto h-full pt-0 sm:pt-10">
+          {isLoading ? (
+            <p>Loading...</p>
           ) : (
-            <Outlet />
+            links.map((link, index) => (
+              <Link
+                key={index}
+                to={link.to}
+                className="text-gray-700 hover:text-blue-600 flex items-center gap-3 py-2 rounded-md hover:bg-gray-100 transition"
+                onClick={() => setSidebarOpen(false)}
+              >
+                {link.icon} <span>{link.label}</span>
+              </Link>
+            ))
           )}
-        </div>
+        </nav>
       </div>
-    </div>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black opacity-30 z-10 sm:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main content */}
+      <main className="pt-14 sm:ml-64 bg-gray-50">
+        <Outlet />
+      </main>
+    </>
   );
 };
 
-export default Dashboard;
+export default DashboardNavbar;
+ 

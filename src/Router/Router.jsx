@@ -19,8 +19,7 @@ import MyEmploy from "../Dashboard/HrPages/MyEmploy/MyEmploy";
 import MyTeam from "../Dashboard/EmployPages/MyTeam/MyTeam";
 import EmployHome from "../Dashboard/EmployPages/EmployHome/EmployHome";
 import HrHome from "../Dashboard/HrPages/HrHome/HrHome";
-import PrivateRoute from "./PrivateRoute";
-import AdminRoute from "./AdminRoute";
+import AdminDashborad from "../Dashboard/Admin/AdminDashborad";
 
 export const router = createBrowserRouter([
     {
@@ -48,24 +47,29 @@ export const router = createBrowserRouter([
     },
     {
         path: '/dashboard',
-        element: <PrivateRoute><Dashboard></Dashboard></PrivateRoute>,
+        element: <Dashboard></Dashboard>,
 
         children: [
             {
-              path:'hr-home',
-              element:<HrHome></HrHome>
+                path: '/dashboard/admin-dashbord',
+                element: <AdminDashborad></AdminDashborad>
+            },
+
+            {
+                path: 'hr-home',
+                element: <HrHome></HrHome>
             },
             {
                 path: 'addAssets',
-                element:<AdminRoute> <AddAssets></AddAssets></AdminRoute>
+                element: <AddAssets></AddAssets>
             },
             {
                 path: 'all-requests',
-                element:<AdminRoute> <RequestAll></RequestAll></AdminRoute>
+                element: <RequestAll></RequestAll>
             },
             {
                 path: 'asset-list',
-                element:<AdminRoute> <MyAssetsList></MyAssetsList></AdminRoute>
+                element: <MyAssetsList></MyAssetsList>
             },
             {
                 path: 'assets-update/:id',
@@ -73,29 +77,16 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'add-employee',
-                element:<AdminRoute> <AddEmploy></AddEmploy></AdminRoute>
+                element: <AddEmploy></AddEmploy>
             },
             {
                 path: 'employee-list',
-                element: <AdminRoute><MyEmploy></MyEmploy></AdminRoute>
+                element: <MyEmploy></MyEmploy>
             },
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             {
                 path: 'emHome',
-                element: <PrivateRoute><EmployHome></EmployHome></PrivateRoute>
+                element: <EmployHome></EmployHome>
             },
 
             {
@@ -113,3 +104,19 @@ export const router = createBrowserRouter([
         ]
     }
 ]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

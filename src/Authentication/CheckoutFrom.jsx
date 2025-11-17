@@ -34,7 +34,7 @@ const CheckoutForm = ({ hrUserInfo }) => {
 
   const handlePaymentSuccess = async () => {
     try {
-      const res = await axios.post(`http://https://asset-management-system-server-kappa.vercel.app/users/${hrUserInfo.email}`, hrUserInfo);
+      const res = await axios.post(`http://http://localhost:5000/users/${hrUserInfo.email}`, hrUserInfo);
       console.log('✅ User saved to database:', res.data);
 
       Swal.fire({
