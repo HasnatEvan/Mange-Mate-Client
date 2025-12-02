@@ -16,27 +16,42 @@ import {
   FaAsterisk,
 } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../src/assets/logo/logo.png";
 import useAuth from "../Hooks/useAuth";
 import useRole from "../Hooks/useRole";
-
+import { FaExclamationTriangle } from "react-icons/fa";
 const DashboardNavbar = () => {
   const { user } = useAuth();
   const [role, isLoading] = useRole();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+  // Redirect only when visiting /dashboard
+  useEffect(() => {
+    if (!isLoading && role && location.pathname === "/dashboard") {
+      if (role === "admin") navigate("/dashboard/admin-dashbord");
+      if (role === "hr") navigate("/dashboard/hr-home");
+      if (role === "employee") navigate("/dashboard/emHome");
+    }
+  }, [role, isLoading, location.pathname, navigate]);
+
+  // SEARCH BAR WORKING
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    console.log("Search submitted:", searchQuery);
+    if (searchQuery.trim() !== "") {
+      navigate(`/dashboard/search?query=${searchQuery}`);
+    }
   };
 
-  // Dropdown close on outside click
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+
+  // CLOSE DROPDOWN ON OUTSIDE CLICK
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -47,13 +62,46 @@ const DashboardNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Role-wise links
+  // ROLE NOT FOUND → NO NAVBAR, NO SIDEBAR, ONLY MESSAGE
+if (!isLoading && !role) {
+  return (
+    <div className="w-full min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 shadow-lg rounded-md text-center max-w-md">
+        
+        {/* Warning Icon */}
+        <FaExclamationTriangle className="text-yellow-500 text-5xl mx-auto mb-4" />
+
+        <h2 className="text-2xl font-bold text-red-600">No Role Assigned</h2>
+
+        <p className="text-gray-700 mt-3">
+          Your account does not have any assigned role.<br/>
+          Please contact the administrator.
+        </p>
+
+        {/* Optional Button */}
+        <button
+          onClick={() => navigate("/")}
+          className="mt-5 px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+        >
+          Go to Home
+        </button>
+
+      </div>
+    </div>
+  );
+}
+
+  // LINKS
+  const commonLinks = [
+    { to: "/", icon: <FaHome />, label: "Home" },
+  ];
+
   const adminLinks = [
     { to: "/dashboard/admin-dashbord", icon: <FaHome />, label: "Admin Dashboard" },
   ];
 
   const hrLinks = [
-    { to: "/dashboard/hr-home", icon: <FaHome />, label: "HR Home" },
+    { to: "/dashboard/hr-home", icon: <FaHome />, label: "Dashboard" },
     { to: "/dashboard/asset-list", icon: <FaClipboardList />, label: "Asset List" },
     { to: "/dashboard/addAssets", icon: <FaLaptopHouse />, label: "Add an Asset" },
     { to: "/dashboard/all-requests", icon: <FaRegPaperPlane />, label: "All Requests" },
@@ -62,30 +110,28 @@ const DashboardNavbar = () => {
   ];
 
   const employeeLinks = [
-    { to: "/dashboard/emHome", icon: <FaHome />, label: "Employee Home" },
+    { to: "/dashboard/emHome", icon: <FaHome />, label: "Dashboard" },
     { to: "/dashboard/my-assets", icon: <FaClipboardList />, label: "My Assets" },
     { to: "/dashboard/my-team", icon: <FaUsers />, label: "My Team" },
     { to: "/dashboard/request-asset", icon: <FaAsterisk />, label: "Request for Asset" },
   ];
 
-  // Set links by role
-  let links = [];
+  let topLinks = [];
   if (!isLoading) {
-    if (role === "admin") links = adminLinks;
-    else if (role === "hr") links = hrLinks;
-    else if (role === "employee") links = employeeLinks;
+    if (role === "admin") topLinks = [...adminLinks];
+    else if (role === "hr") topLinks = [...hrLinks];
+    else if (role === "employee") topLinks = [...employeeLinks];
   }
 
   return (
     <>
-      {/* Navbar */}
-      <header className="w-full bg-white border-b flex items-center justify-between px-4 py-2 shadow-sm fixed top-0 z-30">
-        {/* Left: Logo */}
+      {/* NAVBAR */}
+      <header className="w-full bg-white text-gray-700 flex items-center justify-between px-4 py-2 fixed top-0 z-30">
         <div className="flex items-center gap-3">
-          <img src={logo} alt="ABSTACK Logo" className="h-8" />
+          <img src={logo} alt="Logo" className="h-8" />
         </div>
 
-        {/* Center: Search */}
+        {/* SEARCH BAR */}
         <form
           onSubmit={handleSearchSubmit}
           className="hidden sm:flex mx-auto w-full max-w-sm md:max-w-md relative"
@@ -93,63 +139,44 @@ const DashboardNavbar = () => {
           <IoSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 text-lg" />
           <input
             type="text"
-            placeholder="Search something.."
+            placeholder="Search something..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="pl-10 pr-4 py-2 bg-gray-100 rounded-full text-sm text-black focus:outline-none w-full placeholder-gray-400"
+            className="pl-10 pr-4 py-2 bg-gray-100 rounded-full text-sm text-black w-full"
           />
         </form>
 
-        {/* Right Icons */}
+        {/* RIGHT ICONS */}
         <div className="flex items-center gap-3 sm:gap-4">
           <FaBell className="text-gray-500 text-lg cursor-pointer" />
           <FaThLarge className="text-gray-500 text-lg cursor-pointer hidden sm:block" />
           <FaCog className="text-gray-500 text-lg cursor-pointer hidden sm:block" />
           <FaMoon className="text-gray-500 text-lg cursor-pointer hidden md:block" />
 
-          {/* Profile Dropdown */}
+          {/* PROFILE DROPDOWN */}
           <div className="relative" ref={dropdownRef}>
             <div
               className="flex items-center gap-2 cursor-pointer"
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <img
-                src={
-                  user?.photoURL ||
-                  "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                }
+                src={user?.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
                 alt="Profile"
                 className="h-8 w-8 rounded-full object-cover"
               />
-              <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                {user?.displayName || "User"}
-              </span>
-              <svg
-                className="w-4 h-4 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              <span className="text-sm text-gray-700 hidden sm:block">{user?.displayName}</span>
             </div>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-1">
-                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  My Account
-                </button>
-                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Support
-                </button>
-                <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Logout
-                </button>
+              <div className="absolute right-0 mt-2 w-48 bg-white  rounded-md shadow-lg py-1">
+                <button className="block w-full px-4 py-2 text-sm hover:bg-gray-100">My Account</button>
+                <button className="block w-full px-4 py-2 text-sm hover:bg-gray-100">Support</button>
+                <button className="block w-full px-4 py-2 text-sm hover:bg-gray-100">Logout</button>
               </div>
             )}
           </div>
 
-          {/* Sidebar Toggle (Mobile) */}
+          {/* MOBILE SIDEBAR BUTTON */}
           <FaBars
             className="text-gray-600 text-xl cursor-pointer sm:hidden"
             onClick={() => setSidebarOpen(true)}
@@ -157,49 +184,53 @@ const DashboardNavbar = () => {
         </div>
       </header>
 
-      {/* Sidebar */}
+      {/* SIDEBAR */}
       <div
-        className={`fixed top-12 left-0 h-[calc(100%-56px)] w-64 bg-white shadow-lg z-20 
-        transform transition-transform duration-300 
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-        sm:translate-x-0`}
+        className={`fixed top-12 left-0 h-[calc(100%-56px)] text-gray-800 w-64 bg-white shadow-lg z-20 transition-transform 
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} sm:translate-x-0`}
       >
-        {/* Close button for mobile */}
+        {/* MOBILE CLOSE */}
         <div className="flex justify-end p-4 sm:hidden">
-          <FaTimes
-            className="text-gray-600 text-xl cursor-pointer"
-            onClick={() => setSidebarOpen(false)}
-          />
+          <FaTimes className="text-gray-600 text-xl cursor-pointer" onClick={() => setSidebarOpen(false)} />
         </div>
 
-        {/* Sidebar Links */}
-        <nav className="flex flex-col px-4 gap-5 overflow-y-auto h-full pt-0 sm:pt-10">
-          {isLoading ? (
-            <p>Loading...</p>
-          ) : (
-            links.map((link, index) => (
-              <Link
+        {/* SIDEBAR MENU */}
+        <nav className="flex flex-col justify-between h-full px-4 overflow-y-auto">
+          {/* TOP LINKS */}
+          <div className="flex flex-col gap-5 pt-4">
+            {topLinks.map((link, index) => (
+              <NavLink
                 key={index}
                 to={link.to}
-                className="text-gray-700 hover:text-blue-600 flex items-center gap-3 py-2 rounded-md hover:bg-gray-100 transition"
-                onClick={() => setSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-2 rounded-md transition 
+                  ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-100"}`
+                }
               >
                 {link.icon} <span>{link.label}</span>
-              </Link>
-            ))
-          )}
+              </NavLink>
+            ))}
+          </div>
+
+          {/* BOTTOM HOME LINK */}
+          <div className="pb-6 border-t border-gray-200 pt-4">
+            {commonLinks.map((link, index) => (
+              <NavLink
+                key={index}
+                to={link.to}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-2 rounded-md transition 
+                  ${isActive ? "bg-blue-100 text-blue-600 font-semibold" : "hover:bg-gray-100"}`
+                }
+              >
+                {link.icon} <span>{link.label}</span>
+              </NavLink>
+            ))}
+          </div>
         </nav>
       </div>
 
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black opacity-30 z-10 sm:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Main content */}
+      {/* MAIN CONTENT */}
       <main className="pt-14 sm:ml-64 bg-gray-50">
         <Outlet />
       </main>
@@ -208,4 +239,3 @@ const DashboardNavbar = () => {
 };
 
 export default DashboardNavbar;
- 

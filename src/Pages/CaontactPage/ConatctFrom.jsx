@@ -40,7 +40,7 @@ const ContactFrom = () => {
               <FaPhoneAlt className="text-blue-500" /> +61 3 8376 6284
             </li>
             <li className="flex items-center gap-2">
-              <FaEnvelope className="text-blue-500" /> info@2035themes.com
+              <FaEnvelope className="text-blue-500" /> masum.clippingdealer@gmail.com
             </li>
           </ul>
         </div>

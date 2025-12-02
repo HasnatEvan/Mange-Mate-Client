@@ -82,13 +82,14 @@ const MyEmploy = () => {
 
         {/* EMPTY STATE */}
         {filteredEmployees.length === 0 ? (
-          <div className="flex items-center justify-center h-[80vh]">
-            <div className="bg-white/80 p-8 rounded-2xl shadow-xl border border-gray-300 text-center">
-              <FaUser className="text-blue-500 text-5xl mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800">No Employees Found</h2>
-              <p className="text-gray-600 mt-2">You currently have no employees.</p>
-            </div>
-          </div>
+         <div className="flex items-center justify-center min-h-screen">
+  <div className="bg-white/80 p-8 rounded-2xl shadow-xl border border-gray-300 text-center">
+    <FaUser className="text-blue-500 text-5xl mx-auto mb-4" />
+    <h2 className="text-2xl font-bold text-gray-800">No Employees Found</h2>
+    <p className="text-gray-600 mt-2">You currently have no employees.</p>
+  </div>
+</div>
+
         ) : (
           <>
             {/* TOP 4 STATS */}

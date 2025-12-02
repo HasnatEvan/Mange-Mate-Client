@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaUsers, FaUserTie, FaUserFriends, FaBoxes } from "react-icons/fa";
 import Card from "./Card";
 import Chart from "./Chart";
+import { MdSync } from "react-icons/md";
 
 const AdminDashborad = () => {
     const { data, isLoading } = useQuery({
@@ -15,14 +16,14 @@ const AdminDashborad = () => {
         },
     });
 
-    if (isLoading)
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <p className="text-blue-600 text-lg font-semibold animate-pulse">
-                    Loading...
-                </p>
-            </div>
-        );
+ if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <MdSync className="text-blue-600 text-4xl animate-spin" />
+        <p className="ml-2 text-blue-600 text-lg font-semibold">Loading Requests...</p>
+      </div>
+    );
+  }
 
     const stats = [
         {

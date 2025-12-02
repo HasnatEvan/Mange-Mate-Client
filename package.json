@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@coreui/icons": "^3.0.1",
+    "@coreui/icons-react": "^2.3.0",
+    "@coreui/react": "^5.9.1",
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@react-pdf/renderer": "^4.3.0",
     "@stripe/react-stripe-js": "^3.7.0",
@@ -17,6 +20,7 @@
     "@tailwindcss/vite": "^4.1.5",
     "@tanstack/react-query": "^5.75.4",
     "axios": "^1.9.0",
+    "chart.js": "^4.5.1",
     "firebase": "^11.6.1",
     "framer-motion": "^12.23.24",
     "localforage": "^1.10.0",
@@ -24,6 +28,7 @@
     "lucide-react": "^0.507.0",
     "match-sorter": "^8.0.1",
     "react": "^19.1.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
@@ -35,7 +40,8 @@
     "sweetalert2": "^11.21.0",
     "sweetalert2-react-content": "^5.1.0",
     "tailwind-scrollbar-hide": "^4.0.0",
-    "tailwindcss": "^4.1.5"
+    "tailwindcss": "^4.1.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

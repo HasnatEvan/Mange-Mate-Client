@@ -5,7 +5,7 @@ import useAuth from "../../../Hooks/useAuth";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 
 const AssetsTable = ({ asset, refetch, mobile = false }) => {
-  const { assetsName, assetsType, quantity, _id, companyName,hr } = asset;
+  const { assetsName, assetsType, quantity, _id, companyName, hr } = asset;
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
   const MySwal = withReactContent(Swal);
@@ -15,7 +15,6 @@ const AssetsTable = ({ asset, refetch, mobile = false }) => {
     const { value: note } = await MySwal.fire({
       title: "Request Asset",
       html: `<input id="note" class="swal2-input" placeholder="Additional notes (required)" />`,
-      focusConfirm: false,
       showCancelButton: true,
       confirmButtonText: "Request",
       preConfirm: () => {
@@ -28,18 +27,15 @@ const AssetsTable = ({ asset, refetch, mobile = false }) => {
       },
     });
 
-    if (!note) return; // User cancelled or empty note
+    if (!note) return;
 
     const requestData = {
-      employ: {
-        name: user?.displayName,
-        email: user?.email,
-      },
+      employ: { name: user?.displayName, email: user?.email },
       requestId: _id,
       assetsName,
       assetsType,
       quantity: 1,
-      note: note,
+      note,
       requestDate: new Date().toISOString(),
       status: "pending",
       assetsOwner: hr?.email,
@@ -49,37 +45,17 @@ const AssetsTable = ({ asset, refetch, mobile = false }) => {
       const res = await axiosSecure.post("/requests", requestData);
 
       if (res.data.insertedId) {
-        const stockResponse = await axiosSecure.patch(`/assets/quantity/${_id}`, {
+        await axiosSecure.patch(`/assets/quantity/${_id}`, {
           quantityToUpdate: 1,
           status: "decrease",
         });
 
-        if (stockResponse.data.modifiedCount > 0) {
-          await Swal.fire({
-            icon: "success",
-            title: "Request Successful!",
-            text: "Asset requested and stock updated successfully.",
-          });
-
-          refetch();
-          navigate("/dashboard/my-assets");
-        } else {
-          await Swal.fire({
-            icon: "success",
-            title: "Request Successful!",
-            text: "Asset requested and stock updated successfully.",
-          });
-          refetch();
-          navigate("/dashboard/my-assets");
-        }
+        Swal.fire("Success!", "Request submitted successfully.", "success");
+        refetch();
+        navigate("/dashboard/my-assets");
       }
     } catch (error) {
-      console.error("Request failed:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Something went wrong while submitting the request.",
-      });
+      Swal.fire("Error", "Failed to send request", "error");
     }
   };
 
@@ -89,14 +65,14 @@ const AssetsTable = ({ asset, refetch, mobile = false }) => {
         {quantity > 0 ? (
           <button
             onClick={handleRequest}
-            className="bg-primary text-white py-1 px-3 rounded text-sm"
+            className="w-full py-2 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition"
           >
             Request
           </button>
         ) : (
           <button
             disabled
-            className="bg-gray-400 text-white py-1 px-3 rounded text-sm cursor-not-allowed"
+            className="w-full py-2 bg-gray-400 text-white rounded-xl cursor-not-allowed"
           >
             Out of Stock
           </button>
@@ -106,29 +82,23 @@ const AssetsTable = ({ asset, refetch, mobile = false }) => {
   }
 
   return (
-    <tr className="text-center hover:bg-gray-50">
-      <td className="py-2 px-4 border-b">{companyName}</td>
-      <td className="py-2 px-4 border-b">{assetsName}</td>
-      <td className="py-2 px-4 border-b">{assetsType}</td>
-      <td className="py-2 px-4 border-b">{quantity}</td>
-      <td className="py-2 px-4 border-b">
-        {quantity > 0 ? (
-          <button
-            onClick={handleRequest}
-            className="bg-[#FD8E29] text-white py-1 px-3 rounded text-sm"
-          >
-            Request
-          </button>
-        ) : (
-          <button
-            disabled
-            className="bg-gray-400 text-white py-1 px-3 rounded text-sm cursor-not-allowed"
-          >
-            Out of Stock
-          </button>
-        )}
-      </td>
-    </tr>
+    <div className="flex justify-center">
+      {quantity > 0 ? (
+        <button
+          onClick={handleRequest}
+          className="bg-blue-600 text-white px-4 py-1 rounded-lg shadow hover:bg-blue-700"
+        >
+          Request
+        </button>
+      ) : (
+        <button
+          disabled
+          className="bg-gray-400 text-white px-4 py-1 rounded-lg cursor-not-allowed"
+        >
+          Out of Stock
+        </button>
+      )}
+    </div>
   );
 };
 
